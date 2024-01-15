@@ -1,0 +1,127 @@
+<%- include('_layout/doctype.ejs') %>
+<div id="app" class="app app-full-height app-without-header">
+  <div class="login">
+    <div class="login-content">
+      <div name="login_form">
+        <h1 class="text-center">Sign In</h1>
+        <div class="text-inverse text-opacity-50 text-center mb-4">
+          For your protection, please verify your identity.
+        </div>
+        <div id="error-messages"></div>
+        <div class="mb-3">
+          <label class="form-label"
+            >Email Address <span class="text-danger">*</span></label
+          >
+          <input
+            type="email"
+            id="email"
+            class="form-control form-control-lg bg-inverse bg-opacity-5"
+            value=""
+            placeholder=""
+          />
+        </div>
+        <div class="mb-3">
+          <div class="d-flex">
+            <label class="form-label"
+              >Password <span class="text-danger">*</span></label
+            >
+            <a
+              href="#"
+              class="ms-auto text-inverse text-decoration-none text-opacity-50"
+              >Forgot password?</a
+            >
+          </div>
+          <input
+            type="password"
+            id="password"
+            class="form-control form-control-lg bg-inverse bg-opacity-5"
+            value=""
+            placeholder=""
+          />
+        </div>
+        <div class="mb-3">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value=""
+              id="customCheck1"
+            />
+            <label class="form-check-label" for="customCheck1"
+              >Remember me</label
+            >
+          </div>
+        </div>
+        <button
+          id="Login"
+          type="button"
+          class="btn btn-outline-theme btn-lg d-block w-100 fw-500 mb-3"
+        >
+          Sign In
+        </button>
+        <div class="text-center text-inverse text-opacity-50">
+          Don't have an account yet? <a href="/admin/register">Sign up</a>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Gửi Data
+    $("#Login").on("click", function () {
+      sendAuthorizedRequest("/user/login", "POST", {
+        type: "Login",
+        email: $("#email").val(),
+        password: $("#password").val(),
+      })
+        .done(function (res) {
+          Swal.fire({
+            icon: res.status ? "success" : "error",
+            title: "Thông Báo",
+            text: res.message,
+          }).then(() => {
+            if (res.status) {
+              localStorage.setItem("accessToken", res.result.accessToken);
+              localStorage.setItem("refreshToken", res.result.refreshToken);
+              sendAuthorizedRequest("/user/me", "GET")
+                .then((response) => {
+                  if (response.status) {
+                    setCookie("user", JSON.stringify(response.result));
+                    window.location.href = "/admin";
+                  } else {
+                    window.location.href = "/admin/login";
+                  }
+                })
+                .catch((error) => {
+                  console.error("Lỗi khi thực hiện yêu cầu /user/me:", error);
+                });
+            } else {
+              console.log("lỗi đăng nhập lỗi");
+            }
+          });
+        })
+        .fail(function (xhr, status, error) {
+          if (xhr.status === 422) {
+            // Validation errors
+            var errors = xhr.responseJSON.result;
+            var errorString = "";
+            for (var key in errors) {
+              if (Array.isArray(errors[key])) {
+                errorString += key + ": " + errors[key].join(", ") + "<br>";
+              } else {
+                errorString += key + ": " + errors[key].msg + "<br>";
+              }
+            }
+            $("#error-messages").html(
+              '<div class="alert alert-danger">' + errorString + "</div>"
+            );
+          } else {
+            // Other errors
+            console.error(error);
+          }
+        });
+    });
+  </script>
+
+  <%- include('_layout/footer.ejs') %>
+</div>
