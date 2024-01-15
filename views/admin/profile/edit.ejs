@@ -1,0 +1,300 @@
+<%- include('../_layout/header.ejs') %> 
+<%- include('../_layout/sidebar.ejs') %>
+<div id="content" class="app-content">
+    <% 
+     function formatDate(inputDate) {
+        const date = new Date(inputDate);
+      
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+      
+        // Định dạng giờ và phút để luôn có 2 chữ số
+        const formattedHours = hours.toString().padStart(2, "0");
+        const minutesStr = minutes.toString().padStart(2, "0");
+      
+        const formattedDate = `${formattedHours}:${minutesStr} ${day}-${month}-${year}`;
+        return formattedDate;
+      }
+      %>
+
+    <div class="container">
+    
+    <div class="row justify-content-center">
+    
+    <div class="col-xl-12">
+    
+    <div class="row">
+    
+    <div class="col-xl-10">
+    
+    <div id="general" class="mb-5">
+    <h4><i class="far fa-user fa-fw text-theme"></i> Edit [ <%= user.username %> ]</h4>
+    <p>View and update your general account information and settings.</p>
+    <div class="mb-3">
+       
+        <div class="row row-space-10">
+        <div class="col-4">
+            <label class="form-label">Username</label>
+        <input class="form-control" placeholder="Username" id="username" required value="<%= user.username %>">
+        </div>
+        <div class="col-4">
+            <label class="form-label">Email</label>
+        <input class="form-control" placeholder="Email" id="email" required  value="<%= user.email %>">
+        </div>
+        <div class="col-4">
+            <div class="form-group mb-3">
+                <label class="form-label" for="exampleFormControlSelect1">Banned</label>
+                <select class="form-select" id="exampleFormControlSelect1">
+                <option value="false">On</option>
+                <option value="true">Off</option>
+                </select>
+                </div>
+        
+        </div>
+        </div>
+
+        <div class="col-xl-12">
+            <div class="form-group mb-3">
+                <label class="form-label" for="role">Role</label>
+                <select class="form-select" id="role">
+                <option value="member">Member</option>
+                <option value="admin">Admin</option>
+                <option value="employee">Eployee</option>
+                </select>
+                </div>
+        
+            
+        </div>
+
+        <div class="row row-space-10">
+            <div class="col-4">
+                <label class="form-label">Money</label>
+            <input class="form-control" placeholder="Money" disabled value="<%= user.money %>đ">
+            </div>
+            <div class="col-4">
+                <label class="form-label">Total Money</label>
+            <input class="form-control" placeholder="Total Money" disabled  value="<%= user.total_money %>đ">
+            </div>
+            <div class="col-4">
+                <label class="form-label">IP Login</label>
+            <input class="form-control" placeholder="Total Money" disabled  value="<%= user.ip %>">
+            </div>
+            </div>
+            
+        </div>
+        <div class="row row-space-10 mb-3">
+            <div class="col-6">
+                <label class="form-label">Device Login</label>
+            <input class="form-control" placeholder="Device Login" disabled value="<%= user.device %>">
+            </div>
+            <div class="col-6">
+                <label class="form-label">First Login</label>
+            <input class="form-control" placeholder="First Login" disabled value="<%= formatDate(user.createdAt) %>">
+            </div>
+          
+            </div>
+            <div class="form-group row">
+                <div class="left">
+                <button type="button" style="
+                float: right;
+            " id="UpdateUser" class="btn btn-outline-theme">Save</button>
+                </div>
+                </div>
+
+<hr>
+<h4><i class="far fa-user fa-fw text-theme"></i> Balance [ <%= user.username %> ]</h4>
+<div class="row row-space-10 mb-3">
+
+        <div class="col-xl-6">
+        <div class="form-group mb-3">
+        <label class="form-label" for="exampleFormControlInput1">+ Amount</label>
+        <input type="number" class="form-control" id="addamout" required value="" placeholder="+ 10.000">
+        </div>
+      
+        <div class="form-group row">
+            <div class="left">
+            <button type="button" id="AddAmount" class="btn btn-outline-theme">Cộng</button>
+            </div>
+            </div>
+
+<hr>
+        </div>
+        <div class="col-xl-6">
+            <div class="form-group mb-3">
+            <label class="form-label" for="exampleFormControlInput1">- Amount</label>
+            <input type="number" class="form-control" id="apartamout" value="" required placeholder="- 10.000">
+            </div>
+          
+            <div class="form-group row">
+                <div class="left">
+                <button type="button" style="
+                float: right;
+            " id="ApartAmount" class="btn btn-outline-theme">Trừ</button>
+                </div>
+                </div>
+                <hr>
+            </div>
+       
+</div>
+    </div>
+            
+        </div>
+    </div>
+    </div>
+    
+   
+   
+   
+    
+ 
+    </div>
+    
+    
+    </div>
+    
+    </div>
+    
+    </div>
+    
+    </div>
+    
+    </div>
+
+    <script>
+        // Gửi Data
+        $("#UpdateUser").on("click", function () {
+          sendAuthorizedRequest("/user/update", "POST", {
+            type: "Update",
+            email: $("#email").val(),
+            username: $("#username").val(),
+            banned: $("#banned").val(),
+            role: $("#role").val(),
+          })
+            .done(function (res) {
+              Swal.fire({
+                icon: res.status ? "success" : "error",
+                title: "Thông Báo",
+                text: res.message,
+              }).then(() => {
+                if (res.status) {
+                  
+                } else {
+                  console.log("lỗi cập nhật user lỗi");
+                }
+              });
+            })
+            .fail(function (xhr, status, error) {
+              if (xhr.status === 422) {
+                // Validation errors
+                var errors = xhr.responseJSON.result;
+                var errorString = "";
+                for (var key in errors) {
+                  if (Array.isArray(errors[key])) {
+                    errorString += key + ": " + errors[key].join(", ") + "<br>";
+                  } else {
+                    errorString += key + ": " + errors[key].msg + "<br>";
+                  }
+                }
+                $("#error-messages").html(
+                  '<div class="alert alert-danger">' + errorString + "</div>"
+                );
+              } else {
+                // Other errors
+                console.error(error);
+              }
+            });
+        });
+      </script>
+
+<script>
+    // Gửi Data
+    $("#AddAmount").on("click", function () {
+      sendAuthorizedRequest("/user/update", "POST", {
+        type: "Update",
+        amout: $("#addamout").val(),
+      })
+        .done(function (res) {
+          Swal.fire({
+            icon: res.status ? "success" : "error",
+            title: "Thông Báo",
+            text: res.message,
+          }).then(() => {
+            if (res.status) {
+              
+            } else {
+              console.log("lỗi cập nhật user lỗi");
+            }
+          });
+        })
+        .fail(function (xhr, status, error) {
+          if (xhr.status === 422) {
+            // Validation errors
+            var errors = xhr.responseJSON.result;
+            var errorString = "";
+            for (var key in errors) {
+              if (Array.isArray(errors[key])) {
+                errorString += key + ": " + errors[key].join(", ") + "<br>";
+              } else {
+                errorString += key + ": " + errors[key].msg + "<br>";
+              }
+            }
+            $("#error-messages").html(
+              '<div class="alert alert-danger">' + errorString + "</div>"
+            );
+          } else {
+            // Other errors
+            console.error(error);
+          }
+        });
+    });
+  </script>
+
+<script>
+    // Gửi Data
+    $("#ApartAmout").on("click", function () {
+      sendAuthorizedRequest("/user/update", "POST", {
+        type: "Update",
+        amout: $("#apartamout").val(),
+      })
+        .done(function (res) {
+          Swal.fire({
+            icon: res.status ? "success" : "error",
+            title: "Thông Báo",
+            text: res.message,
+          }).then(() => {
+            if (res.status) {
+              
+            } else {
+              console.log("lỗi cập nhật user lỗi");
+            }
+          });
+        })
+        .fail(function (xhr, status, error) {
+          if (xhr.status === 422) {
+            // Validation errors
+            var errors = xhr.responseJSON.result;
+            var errorString = "";
+            for (var key in errors) {
+              if (Array.isArray(errors[key])) {
+                errorString += key + ": " + errors[key].join(", ") + "<br>";
+              } else {
+                errorString += key + ": " + errors[key].msg + "<br>";
+              }
+            }
+            $("#error-messages").html(
+              '<div class="alert alert-danger">' + errorString + "</div>"
+            );
+          } else {
+            // Other errors
+            console.error(error);
+          }
+        });
+    });
+  </script>
+    
+
+
+<%- include('../_layout/footer.ejs') %>

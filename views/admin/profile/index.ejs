@@ -1,0 +1,114 @@
+<%- include('../_layout/header.ejs') %> 
+<%- include('../_layout/sidebar.ejs') %>
+<% function formatNumber(num) {
+    if (num == null) {
+      return "0"; 
+     } 
+     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,"); 
+   } 
+ %>
+
+ <% 
+
+ function formatDate(inputDate) {
+    const date = new Date(inputDate);
+  
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+  
+    // Định dạng giờ và phút để luôn có 2 chữ số
+    const formattedHours = hours.toString().padStart(2, "0");
+    const minutesStr = minutes.toString().padStart(2, "0");
+  
+    const formattedDate = `${formattedHours}:${minutesStr} ${day}-${month}-${year}`;
+    return formattedDate;
+  }
+
+  %>
+<link href="/template/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+<link href="/template/css/responsive.bootstrap5.min.css" rel="stylesheet">
+<link href="/template/css/buttons.bootstrap5.min.css" rel="stylesheet">
+
+<script src="/template/js/jquery.dataTables.min.js"></script>
+<script src="/template/js/dataTables.bootstrap5.min.js"></script>
+<script src="/template/js/dataTables.buttons.min.js"></script>
+<script src="/template/js/buttons.colVis.min.js"></script>
+<script src="/template/js/buttons.flash.min.js"></script>
+<script src="/template/js/buttons.html5.min.js"></script>
+<script src="/template/js/buttons.print.min.js"></script>
+<script src="/template/js/buttons.bootstrap5.min.js"></script>
+<script src="/template/js/dataTables.responsive.min.js"></script>
+<script src="/template/js/responsive.bootstrap5.min.js"></script>
+
+<div id="content" class="app-content">
+
+    <div class="container">
+    
+    <div class="row justify-content-center">
+    
+    <div class="col-xl-10">
+    
+    <div class="row">
+    
+    <div class="col-xl-10">
+    
+    <div id="general" class="mb-5">
+    <h4><i class="far fa-user fa-fw text-theme"></i> General</h4>
+    <p>View and update your general account information and settings.</p>
+    <table id="datatableDefault" class="table text-nowrap w-100">
+        <thead>
+        <tr>
+        <th>#</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Ví</th>
+        <th>Trạng thái</th>
+        <th>Thời gian</th>
+        <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody>
+            <% users.forEach((item,index) => { %>
+        <tr>
+        <td><%= index %>.</td>
+        <td><%= item.username %></td>
+        <td><%= item.email %></td>
+        <td><%= formatNumber(item.money) %></td>
+        <td><%= item.banned ? 'Banned' : 'Active' %></td>
+        <td><%= formatNumber(item.createdAt) %></td>
+        <td><a href="/admin/profile/edit/<%= item._id %>" class="btn btn-primary">Edit</a> | <button type="button" id="Delete" class="btn btn-danger">Delete</button></td>
+        </tr>
+        <% }); %>
+        </tbody>
+        </table>
+    </div>
+    
+   
+   
+   
+    
+ 
+    </div>
+    
+    
+    </div>
+    
+    </div>
+    
+    </div>
+    
+    </div>
+    
+    </div>
+    <script>
+        $("#datatableDefault").DataTable({
+          dom: "<'row mb-3'<'col-sm-4'l><'col-sm-8 text-end'<'d-flex justify-content-end'fB>>>t<'d-flex align-items-center'<'me-auto'i><'mb-0'p>>",
+          lengthMenu: [10, 20, 30, 40, 50],
+          responsive: true,
+       
+        });
+      </script>
+<%- include('../_layout/footer.ejs') %>

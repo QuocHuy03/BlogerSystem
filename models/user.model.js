@@ -35,7 +35,7 @@ const postSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["member", "admin"],
+      enum: ["member", "admin", "employee"],
       default: "member",
     },
   },
