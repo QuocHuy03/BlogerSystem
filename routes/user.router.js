@@ -7,6 +7,7 @@ const auth = require("../middlewares/auth.js");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const isAdmin = require("../middlewares/isAdmin.js");
 
 router.post(
   "/register",
@@ -309,6 +310,7 @@ router.post(
 );
 
 router.get("/me", auth, userController.getByUserID);
+
 router.patch(
   "/me",
   auth,
@@ -329,6 +331,42 @@ router.patch(
   validate.validateRequest,
   userController.updateByUserID
 );
+
+router.patch(
+  "/update/:id",
+  auth,
+  isAdmin,
+  [
+    body("username")
+      .optional(true)
+      .custom(async (value) => {
+        try {
+          const status = await User.findOne({ username: value });
+          if (status) {
+            return Promise.reject("Người dùng đã tồn tại");
+          }
+        } catch (err) {
+          return Promise.reject(err);
+        }
+      }),
+  ],
+  validate.validateRequest,
+  userController.updateByUserID
+);
+
+router.put(
+  "/amount/:id",
+  auth,
+  isAdmin,
+  body("money")
+    .trim()
+    .notEmpty()
+    .withMessage("Money là bắt buộc")
+    .isNumeric()
+    .withMessage("Money phải là số"),
+    validate.validateRequest,
+    userController.updateMoney
+)
 
 router.put(
   "/change-password",

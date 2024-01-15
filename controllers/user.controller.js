@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const { emailSMPT } = require("../helpers/email.helper");
 const { Types } = require("mongoose");
 const devices = require("../helpers/device.helper");
+const configs = require("../helpers/config.helper");
 
 exports.register = async (req, res, next) => {
   const { username, password, confirm_password, email } = req.body;
@@ -250,6 +251,51 @@ exports.getByUserID = async (req, res, next) => {
         result,
       });
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateByID = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await User.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          ...req.body,
+          updatedAt: new Date(),
+        },
+      },
+      {
+        returnDocument: "after",
+      }
+    );
+
+    return res.status(200).json({
+      status: true,
+      message: "Cập nhật thông tin thành công",
+      result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateMoney = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { type, money } = req.body;
+
+    if (type === "Add") {
+      await configs.PlusCredits(id, money);
+    } else if (type === "Apart") {
+      await configs.RemoveCredits(id, money);
+    }
+    return res.status(200).json({
+      status: true,
+      message: "Cập nhật money thành công",
+    });
   } catch (error) {
     next(error);
   }

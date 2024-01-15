@@ -1,5 +1,4 @@
-const Log_Balance = require("../models/log_balance");
-const User = require("../user-service/models/user.model");
+const User = require("../models/user.model");
 
 async function getUser(id, row) {
   const user = await User.findOne({ _id: id });
@@ -7,27 +6,33 @@ async function getUser(id, row) {
 }
 
 async function deductMoney(model, data, price, where) {
-  return await model.updateOne(where, {
-    $inc: { [data]: -price },
-  });
+  const currentData = await model.findOne(where);
+
+  if (currentData) {
+    const newMoney = currentData[data] - parseInt(price);
+
+    return await model.updateOne(where, {
+      $set: { [data]: newMoney },
+    });
+  } else {
+    throw new Error("Document not found.");
+  }
 }
 
 async function incrementMoney(model, data, price, where) {
-  return await model.updateOne(where, {
-    $inc: { [data]: +price },
-  });
+  const currentData = await model.findOne(where);
+
+  if (currentData) {
+    const newMoney = currentData[data] + parseInt(price);
+    return await model.updateOne(where, {
+      $set: { money: newMoney },
+    });
+  } else {
+    throw new Error("Document not found.");
+  }
 }
 
-exports.RemoveCredits = async (userID, price, reason) => {
-  const moneyBefore = await getUser(userID, "money");
-  await Log_Balance.create({
-    money_before: moneyBefore,
-    money_change: price,
-    money_after: moneyBefore - price,
-    content: reason,
-    userID: userID,
-  });
-
+exports.RemoveCredits = async (userID, price) => {
   const isRemove = await deductMoney(User, "money", price, { _id: userID });
   if (isRemove) {
     return true;
@@ -36,16 +41,7 @@ exports.RemoveCredits = async (userID, price, reason) => {
   }
 };
 
-exports.PlusCredits = async (userID, price, reason) => {
-  const moneyBefore = await getUser(userID, "money");
-  await Log_Balance.create({
-    money_before: moneyBefore,
-    money_change: price,
-    money_after: moneyBefore + price,
-    content: reason,
-    userID: userID,
-  });
-
+exports.PlusCredits = async (userID, price) => {
   const isRemove = await incrementMoney(User, "money", price, { _id: userID });
   if (isRemove) {
     return true;

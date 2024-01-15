@@ -1383,7 +1383,7 @@ function sendAuthorizedRequest(url, method, data = null) {
           console.error("Error refreshing access token nha huydev:", error);
         });
     } else {
-      window.location.href = "/admin/login";
+      return Promise.reject(errorThrown);
     }
   });
 }

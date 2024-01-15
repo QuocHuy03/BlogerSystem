@@ -33,23 +33,24 @@
     <div id="general" class="mb-5">
     <h4><i class="far fa-user fa-fw text-theme"></i> Edit [ <%= user.username %> ]</h4>
     <p>View and update your general account information and settings.</p>
+    <div id="error-messages"></div>
     <div class="mb-3">
        
         <div class="row row-space-10">
         <div class="col-4">
             <label class="form-label">Username</label>
-        <input class="form-control" placeholder="Username" id="username" required value="<%= user.username %>">
+        <input class="form-control" placeholder="Username" disabled required value="<%= user.username %>">
         </div>
         <div class="col-4">
             <label class="form-label">Email</label>
-        <input class="form-control" placeholder="Email" id="email" required  value="<%= user.email %>">
+        <input class="form-control" placeholder="Email" id="email" required value="<%= user.email %>">
         </div>
         <div class="col-4">
             <div class="form-group mb-3">
-                <label class="form-label" for="exampleFormControlSelect1">Banned</label>
-                <select class="form-select" id="exampleFormControlSelect1">
-                <option value="false">On</option>
-                <option value="true">Off</option>
+                <label class="form-label" for="banned">Banned</label>
+                <select class="form-select" id="banned">
+                <option <%= user.banned === false ? 'selected' : '' %> value="false">On</option>
+                 <option <%= user.banned === true ? 'selected' : '' %> value="true">Off</option>
                 </select>
                 </div>
         
@@ -60,9 +61,9 @@
             <div class="form-group mb-3">
                 <label class="form-label" for="role">Role</label>
                 <select class="form-select" id="role">
-                <option value="member">Member</option>
-                <option value="admin">Admin</option>
-                <option value="employee">Eployee</option>
+                <option <%= user.role === 'admin' ? 'selected' : '' %> value="admin">Admin</option>
+                 <option <%= user.role === 'member' ? 'selected' : '' %> value="member">Member</option>
+                 <option <%= user.role === 'employee' ? 'selected' : '' %> value="employee">Employee</option>
                 </select>
                 </div>
         
@@ -107,11 +108,11 @@
 <hr>
 <h4><i class="far fa-user fa-fw text-theme"></i> Balance [ <%= user.username %> ]</h4>
 <div class="row row-space-10 mb-3">
-
+    <div id="error-messages-money"></div>
         <div class="col-xl-6">
         <div class="form-group mb-3">
         <label class="form-label" for="exampleFormControlInput1">+ Amount</label>
-        <input type="number" class="form-control" id="addamout" required value="" placeholder="+ 10.000">
+        <input type="text" class="form-control" id="add_money" required placeholder="+ 10.000">
         </div>
       
         <div class="form-group row">
@@ -125,7 +126,7 @@
         <div class="col-xl-6">
             <div class="form-group mb-3">
             <label class="form-label" for="exampleFormControlInput1">- Amount</label>
-            <input type="number" class="form-control" id="apartamout" value="" required placeholder="- 10.000">
+            <input type="text" class="form-control" id="apart_money" required placeholder="- 10.000">
             </div>
           
             <div class="form-group row">
@@ -166,7 +167,7 @@
     <script>
         // Gửi Data
         $("#UpdateUser").on("click", function () {
-          sendAuthorizedRequest("/user/update", "POST", {
+          sendAuthorizedRequest("/user/update/<%= user._id %>", "PATCH", {
             type: "Update",
             email: $("#email").val(),
             username: $("#username").val(),
@@ -180,7 +181,7 @@
                 text: res.message,
               }).then(() => {
                 if (res.status) {
-                  
+                  window.location.href = "/admin/profile/edit/<%= user._id %>"
                 } else {
                   console.log("lỗi cập nhật user lỗi");
                 }
@@ -212,9 +213,9 @@
 <script>
     // Gửi Data
     $("#AddAmount").on("click", function () {
-      sendAuthorizedRequest("/user/update", "POST", {
-        type: "Update",
-        amout: $("#addamout").val(),
+        sendAuthorizedRequest("/user/amount/<%= user._id %>", "PUT", {
+        type: "Add",
+        money: $("#add_money").val(),
       })
         .done(function (res) {
           Swal.fire({
@@ -223,7 +224,7 @@
             text: res.message,
           }).then(() => {
             if (res.status) {
-              
+                window.location.href = "/admin/profile/edit/<%= user._id %>"
             } else {
               console.log("lỗi cập nhật user lỗi");
             }
@@ -241,7 +242,7 @@
                 errorString += key + ": " + errors[key].msg + "<br>";
               }
             }
-            $("#error-messages").html(
+            $("#error-messages-money").html(
               '<div class="alert alert-danger">' + errorString + "</div>"
             );
           } else {
@@ -254,10 +255,10 @@
 
 <script>
     // Gửi Data
-    $("#ApartAmout").on("click", function () {
-      sendAuthorizedRequest("/user/update", "POST", {
-        type: "Update",
-        amout: $("#apartamout").val(),
+    $("#ApartAmount").on("click", function () {
+        sendAuthorizedRequest("/user/amount/<%= user._id %>", "PUT", {
+        type: "Apart",
+        money: $("#apart_money").val(),
       })
         .done(function (res) {
           Swal.fire({
@@ -266,7 +267,7 @@
             text: res.message,
           }).then(() => {
             if (res.status) {
-              
+                window.location.href = "/admin/profile/edit/<%= user._id %>"
             } else {
               console.log("lỗi cập nhật user lỗi");
             }
@@ -284,7 +285,7 @@
                 errorString += key + ": " + errors[key].msg + "<br>";
               }
             }
-            $("#error-messages").html(
+            $("#error-messages-money").html(
               '<div class="alert alert-danger">' + errorString + "</div>"
             );
           } else {
