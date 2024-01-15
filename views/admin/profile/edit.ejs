@@ -1,4 +1,4 @@
-<%- include('../_layout/header.ejs') %> 
+<%- include('../_layout/header.ejs',{cookie_user: user}) %> 
 <%- include('../_layout/sidebar.ejs') %>
 <div id="content" class="app-content">
     <% 
@@ -31,7 +31,7 @@
     <div class="col-xl-10">
     
     <div id="general" class="mb-5">
-    <h4><i class="far fa-user fa-fw text-theme"></i> Edit [ <%= user.username %> ]</h4>
+    <h4><i class="far fa-user fa-fw text-theme"></i> Edit [ <%= edituser.username %> ]</h4>
     <p>View and update your general account information and settings.</p>
     <div id="error-messages"></div>
     <div class="mb-3">
@@ -39,11 +39,11 @@
         <div class="row row-space-10">
         <div class="col-4">
             <label class="form-label">Username</label>
-        <input class="form-control" placeholder="Username" disabled required value="<%= user.username %>">
+        <input class="form-control" placeholder="Username" disabled required value="<%= edituser.username %>">
         </div>
         <div class="col-4">
             <label class="form-label">Email</label>
-        <input class="form-control" placeholder="Email" id="email" required value="<%= user.email %>">
+        <input class="form-control" placeholder="Email" id="email" required value="<%= edituser.email %>">
         </div>
         <div class="col-4">
             <div class="form-group mb-3">
@@ -61,9 +61,9 @@
             <div class="form-group mb-3">
                 <label class="form-label" for="role">Role</label>
                 <select class="form-select" id="role">
-                <option <%= user.role === 'admin' ? 'selected' : '' %> value="admin">Admin</option>
-                 <option <%= user.role === 'member' ? 'selected' : '' %> value="member">Member</option>
-                 <option <%= user.role === 'employee' ? 'selected' : '' %> value="employee">Employee</option>
+                <option <%= edituser.role === 'admin' ? 'selected' : '' %> value="admin">Admin</option>
+                 <option <%= edituser.role === 'member' ? 'selected' : '' %> value="member">Member</option>
+                 <option <%= edituser.role === 'employee' ? 'selected' : '' %> value="employee">Employee</option>
                 </select>
                 </div>
         
@@ -73,15 +73,15 @@
         <div class="row row-space-10">
             <div class="col-4">
                 <label class="form-label">Money</label>
-            <input class="form-control" placeholder="Money" disabled value="<%= user.money %>đ">
+            <input class="form-control" placeholder="Money" disabled value="<%= edituser.money %>đ">
             </div>
             <div class="col-4">
                 <label class="form-label">Total Money</label>
-            <input class="form-control" placeholder="Total Money" disabled  value="<%= user.total_money %>đ">
+            <input class="form-control" placeholder="Total Money" disabled  value="<%= edituser.total_money %>đ">
             </div>
             <div class="col-4">
                 <label class="form-label">IP Login</label>
-            <input class="form-control" placeholder="Total Money" disabled  value="<%= user.ip %>">
+            <input class="form-control" placeholder="Total Money" disabled  value="<%= edituser.ip %>">
             </div>
             </div>
             
@@ -89,11 +89,11 @@
         <div class="row row-space-10 mb-3">
             <div class="col-6">
                 <label class="form-label">Device Login</label>
-            <input class="form-control" placeholder="Device Login" disabled value="<%= user.device %>">
+            <input class="form-control" placeholder="Device Login" disabled value="<%= edituser.device %>">
             </div>
             <div class="col-6">
                 <label class="form-label">First Login</label>
-            <input class="form-control" placeholder="First Login" disabled value="<%= formatDate(user.createdAt) %>">
+            <input class="form-control" placeholder="First Login" disabled value="<%= formatDate(edituser.createdAt) %>">
             </div>
           
             </div>
@@ -106,7 +106,7 @@
                 </div>
 
 <hr>
-<h4><i class="far fa-user fa-fw text-theme"></i> Balance [ <%= user.username %> ]</h4>
+<h4><i class="far fa-user fa-fw text-theme"></i> Balance [ <%= edituser.username %> ]</h4>
 <div class="row row-space-10 mb-3">
     <div id="error-messages-money"></div>
         <div class="col-xl-6">
@@ -167,7 +167,7 @@
     <script>
         // Gửi Data
         $("#UpdateUser").on("click", function () {
-          sendAuthorizedRequest("/user/update/<%= user._id %>", "PATCH", {
+          sendAuthorizedRequest("/user/update/<%= edituser._id %>", "PATCH", {
             type: "Update",
             email: $("#email").val(),
             username: $("#username").val(),
@@ -181,7 +181,7 @@
                 text: res.message,
               }).then(() => {
                 if (res.status) {
-                  window.location.href = "/admin/profile/edit/<%= user._id %>"
+                  window.location.href = "/admin/profile/edit/<%= edituser._id %>"
                 } else {
                   console.log("lỗi cập nhật user lỗi");
                 }
@@ -213,7 +213,7 @@
 <script>
     // Gửi Data
     $("#AddAmount").on("click", function () {
-        sendAuthorizedRequest("/user/amount/<%= user._id %>", "PUT", {
+        sendAuthorizedRequest("/user/amount/<%= edituser._id %>", "PUT", {
         type: "Add",
         money: $("#add_money").val(),
       })
@@ -224,7 +224,7 @@
             text: res.message,
           }).then(() => {
             if (res.status) {
-                window.location.href = "/admin/profile/edit/<%= user._id %>"
+                window.location.href = "/admin/profile/edit/<%= edituser._id %>"
             } else {
               console.log("lỗi cập nhật user lỗi");
             }
@@ -256,7 +256,7 @@
 <script>
     // Gửi Data
     $("#ApartAmount").on("click", function () {
-        sendAuthorizedRequest("/user/amount/<%= user._id %>", "PUT", {
+        sendAuthorizedRequest("/user/amount/<%= edituser._id %>", "PUT", {
         type: "Apart",
         money: $("#apart_money").val(),
       })
@@ -267,7 +267,7 @@
             text: res.message,
           }).then(() => {
             if (res.status) {
-                window.location.href = "/admin/profile/edit/<%= user._id %>"
+                window.location.href = "/admin/profile/edit/<%= edituser._id %>"
             } else {
               console.log("lỗi cập nhật user lỗi");
             }

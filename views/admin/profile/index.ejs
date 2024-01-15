@@ -1,4 +1,4 @@
-<%- include('../_layout/header.ejs') %> 
+<%- include('../_layout/header.ejs',{cookie_user: user}) %> 
 <%- include('../_layout/sidebar.ejs') %>
 <% function formatNumber(num) {
     if (num == null) {

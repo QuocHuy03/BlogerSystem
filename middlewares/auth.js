@@ -14,9 +14,10 @@ const verifyToken = async (req, res, next) => {
     }
 
     if (!token) {
-      const err = new ProjectError("Vui lòng đăng nhập để tiếp tục!");
-      err.statusCode = 401;
-      throw err;
+      // const err = new ProjectError("Vui lòng đăng nhập để tiếp tục!");
+      // err.statusCode = 401;
+      // throw err;
+      res.redirect('/admin/login');
     }
 
     try {

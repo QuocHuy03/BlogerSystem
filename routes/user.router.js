@@ -349,6 +349,8 @@ router.patch(
           return Promise.reject(err);
         }
       }),
+
+    body("email").notEmpty().withMessage("Email là bắt buộc").optional(true),
   ],
   validate.validateRequest,
   userController.updateByUserID
@@ -364,9 +366,9 @@ router.put(
     .withMessage("Money là bắt buộc")
     .isNumeric()
     .withMessage("Money phải là số"),
-    validate.validateRequest,
-    userController.updateMoney
-)
+  validate.validateRequest,
+  userController.updateMoney
+);
 
 router.put(
   "/change-password",
